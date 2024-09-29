@@ -1,5 +1,7 @@
 # django-payments-chile
 
+**django-payments-chile** es una librería diseñada para facilitar la integración de pagos en aplicaciones Django a través de múltiples proveedores en Chile. Este proyecto ofrece una API simple y flexible para procesar pagos de manera segura, permitiendo a los desarrolladores concentrarse en construir sus aplicaciones sin complicarse con la lógica de integración de cada proveedor.
+
 ![PyPI - Status](https://img.shields.io/pypi/status/django-payments-chile)
 [![Downloads](https://pepy.tech/badge/django-payments-chile)](https://pepy.tech/project/django-payments-chile)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
@@ -9,8 +11,6 @@
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-chile)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/django-payments-chile)
 ![PyPI - License](https://img.shields.io/pypi/l/django-payments-chile)
-
-**django-payments-chile** es una librería diseñada para facilitar la integración de pagos en aplicaciones Django a través de múltiples proveedores en Chile. Este proyecto ofrece una API simple y flexible para procesar pagos de manera segura, permitiendo a los desarrolladores concentrarse en construir sus aplicaciones sin complicarse con la lógica de integración de cada proveedor.
 
 ## Proveedores de pago soportados
 
@@ -35,65 +35,33 @@
 Para instalar la librería, utiliza pip:
 
 ```bash
-pip install django-payments-chile
+pip install django-payments-chile[todos]
 ```
+
+- **flow**: Instala extras para Flow.
+- **khipu**: Instala extras para Khipu.
+- **todos**: Instala todos los extras.
 
 ### Configuración de Proveedores
 
 Agrega las credenciales de los proveedores de pago en tu archivo de configuración:
 
 ```python
-PAYMENTS_PROVIDERS = {
-    'FLOW': {
+PAYMENT_VARIANTS = {
+    'flow': ('django_payments_chile.FlowProvider', {
         'api_key': 'tu_api_key_flow',
         'secret': 'tu_secret_flow',
-    },
-    'KHIPU': {
-        'receiver_id': 'tu_receiver_id',
-        'secret': 'tu_secret_khipu',
-    },
-    'WEBPAY': {
+    }),
+    'webpay': ('django_payments_chile.WebpayProvider', {
         'commerce_code': 'tu_commerce_code_webpay',
         'api_key': 'tu_api_key_webpay',
-    },
-    ...
+    }),
 }
 ```
 
 ## Uso
 
-Para crear y procesar un pago con **django-payments-chile**, simplemente importa el gateway y realiza la transacción:
-
-```python
-from payments_chile import PaymentGateway
-
-gateway = PaymentGateway(provider='webpay')
-response = gateway.create_payment(amount=10000, order_id='123456', return_url='https://tu-sitio.com/return/')
-```
-
-Luego, puedes verificar el estado del pago:
-
-```python
-if gateway.verify_payment(response):
-    # Pago exitoso
-else:
-    # Pago fallido
-```
-
-## Proveedores adicionales
-
-Puedes agregar más proveedores de pago mediante la extensión del gateway o contribuyendo con tus propias integraciones. Cada proveedor tiene una interfaz consistente para facilitar su uso y configuración.
-
-## Contribuciones
-
-Contribuciones son bienvenidas. Por favor, abre un [issue](https://github.com/mariofix/django-payments-chile/issues) o envía un pull request.
-
-Pasos para contribuir:
-
-1. Haz un fork del repositorio.
-2. Crea una rama nueva para tu funcionalidad (`git checkout -b feature-nueva-funcionalidad`).
-3. Realiza los cambios y asegúrate de probarlos.
-4. Envía un pull request con una descripción clara de tu contribución.
+AGREGAR INSTALACION Y PASOS DE CONFIGURACION DE DJANGO-PAYMETNTS
 
 ## Licencia
 

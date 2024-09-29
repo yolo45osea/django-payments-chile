@@ -1,6 +1,11 @@
 site_name: Django Payments Chile
 repo_url: https://github.com/mariofix/django-payments-chile
-repo_name: django-payments-chile
+repo_name: mariofix/django-payments-chile
+site_url: https://mariofix.github.io/django-payments-chile
+site_description: Documentacion para Django Payments
+site_author: mariofix <yo@mariofix.com>
+copyright: "MIT License"
+edit_uri: ""
 
 theme:
   name: material

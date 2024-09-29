@@ -1,80 +1,138 @@
-# Como Usar
+# ¿Qué es django-payments-chile?
 
-## Instalación
+`django-payments-chile` es una extensión de Django que te permite procesar pagos en Chile fácilmente. Funciona con `django-payments`, que es una biblioteca más general para manejar pagos en Django.
 
-Para utilizar el módulo `django-payments-flow`, puedes realizar la instalación mediante el uso de pip o poetry.
+## Paso 1: Preparar tu entorno
 
-=== "usando pip"
-    ```shell
-    pip install django-payments-flow
-    ```
-=== "usando poetry"
-    ```shell
-    poetry add django-payments-flow
-    ```
+Antes de empezar, asegúrate de tener:
 
-## Configuración
+1. Python instalado en tu computadora.
+2. Django instalado y un proyecto Django creado.
 
-La configuración del módulo django-payments-flow se realiza como una variante
-de Django Payments. Debes agregar la siguiente configuración en tu archivo de
-configuración de Django:
+Si no tienes Django, puedes instalarlo con:
+
+```bash
+pip install django
+```
+
+Y crear un nuevo proyecto Django con:
+
+```bash
+django-admin startproject miproyecto
+cd miproyecto
+```
+
+## Paso 2: Instalar las bibliotecas necesarias
+
+Ahora, vamos a instalar `django-payments` y `django-payments-chile`:
+
+```bash
+pip install django-payments django-payments-chile
+```
+
+## Paso 3: Configurar tu proyecto Django
+
+### 3.1 Modificar settings.py
+
+Abre el archivo `settings.py` en tu proyecto Django y agrega estas líneas:
 
 ```python
+INSTALLED_APPS = [
+    # ... tus otras apps ...
+    "payments",
+]
+
+# Configuración para payments
+PAYMENT_HOST = 'tudominio.cl'  # Cambia esto por tu dominio real
+PAYMENT_USES_SSL = True  # Usa False si no tienes HTTPS
+PAYMENT_MODEL = 'pagos.modelos.Pago'
+
+# Configuración para django-payments-chile (ejemplo con Flow)
 PAYMENT_VARIANTS = {
-    "flow": ("django_payments_flow.FlowProvider", {
-        "api_key": "flow_key",
-        "api_secret": "flow_secret",
+    "flow": ("django_payments_chile.FlowProvider", {
+        "api_key": "tu_api_key_de_flow",
+        "api_secret": "tu_api_secret_de_flow",
     })
 }
 ```
 
-Por defecto las llamadas se realizan al ambiente de produccion de Flow, si
-quieres realizar llamadas al ambiente sandbox debes agregar
-`"endpoint": "sandbox"` a la configuracion
+Nota: Reemplaza 'tudominio.cl', 'tu_api_key_de_flow' y 'tu_api_secret_de_flow' con tus datos reales.
+
+### 3.2 Modificar urls.py
+
+Abre el archivo `urls.py` principal de tu proyecto y agrega esta línea:
 
 ```python
-PAYMENT_VARIANTS = {
-    "flow": ("django_payments_flow.FlowProvider", {
-        "api_key": "flow_key",
-        "api_secret": "flow_secret",
-        "api_endpoint": "sandbox"
-    })
-}
+from django.urls import include, path
+
+urlpatterns = [
+    # ... tus otras URLs ...
+    path('payments/', include('payments.urls')),
+]
 ```
 
-### Variables de configuración
+## Paso 4: Crear un modelo de pago
 
-* `api_endpoint`: Valor de ambiente de Flow, puede ser "live o "sandbox" (Valor por
- defecto: live)
-* `api_key`: Este valor corresponde a la cuenta entregada por Flow para
-identificar al receptor de los pagos.
-* `api_secret`: Este valor corresponde a la contraseña entregada por Khipu para
-autenticar la comunicación con su plataforma.
-* `api_medio`: Este valor indica si quieres utilizar algun medio de pago especifico
-segun lo indicado en
-[FlowAPI](https://www.flow.cl/docs/api.html#section/Introduccion/Realizar-pruebas-en-nuestro-ambiente-Sandbox)
-(Valor por defecto: 9)
-
-## Datos Extra
-
-El módulo `django-payments-flow` permite enviar datos extra en cada pago. Para
-hacerlo, debes utilizar un objeto JSON dentro de la propiedad "attrs" del
-modelo de Pagos.
-
-Por ejemplo, si deseas enviar un limite de 5 minutos para cada compra, puedes
-utilizar el siguiente código:
+Crea un nuevo archivo llamado `modelos.py` en una app de tu proyecto (por ejemplo, en una app llamada 'pagos') y agrega este código:
 
 ```python
-datos_extra: dict = {
-    "timeout": 300,
-}
-payment.attrs.datos_extra = datos_extra
-payment.save()
+from django.conf import settings
+from payments.models import BasePayment
+
+class Pago(BasePayment):
+    def get_failure_url(self) -> str:
+        return f"https://{settings.PAYMENT_HOST}/payments/{self.pk}/failure"
+
+    def get_success_url(self) -> str:
+        return f"https://{settings.PAYMENT_HOST}/payments/{self.pk}/success"
 ```
 
-Puedes proporcionar un diccionario unidimensional con los valores extra que
-deseas enviar en cada pago.
+No olvides crear la app 'pagos' si no existe:
 
-Cabe destacar que los valores `apiKey`, `commerceOrder`, `subject`, `amount`,
-`email`, `urlConfirmation`, `urlReturn`, `s` no pueden ser utilizados como
-datos extra y serán ignorados al momento de crear el pago.
+```bash
+python manage.py startapp pagos
+```
+
+Y agrégala a INSTALLED_APPS en settings.py:
+
+```python
+INSTALLED_APPS = [
+    # ... otras apps ...
+    "pagos",
+]
+```
+
+## Paso 5: Usar django-payments-chile en tu vista
+
+Ahora puedes usar django-payments-chile en tus vistas. Aquí tienes un ejemplo:
+
+```python
+from django.shortcuts import redirect
+from payments import get_payment_model
+
+def crear_pago(request):
+    Payment = get_payment_model()
+    payment = Payment.objects.create(
+        variant='flow',  # Esto debe coincidir con lo que pusiste en PAYMENT_VARIANTS
+        description="Pago por Orden #123",
+        total=10000,  # Monto en centavos (100 pesos)
+        currency='CLP',
+        billing_first_name='Juan',
+        billing_last_name='Pérez',
+        billing_email='juan.perez@example.com',
+    )
+    return redirect(payment.get_process_url())
+```
+
+## Paso 6: Crear las páginas de éxito y fracaso
+
+No olvides crear las páginas a las que se redirigirá después del pago (éxito o fracaso). Puedes hacerlo creando nuevas vistas y templates.
+
+## Consejos finales
+
+1. Siempre prueba en un entorno de desarrollo antes de ir a producción.
+2. Mantén seguros tus datos de API (keys, secrets). No los subas a repositorios públicos.
+3. Lee la documentación oficial de django-payments y django-payments-chile para más detalles.
+4. ¡No dudes en pedir ayuda en foros de Django si te atascas!
+
+Recuerda que cada paso puede requerir más configuración dependiendo de tu proyecto específico.

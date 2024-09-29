@@ -22,11 +22,13 @@
 
 ### Instalación
 
-Asegúrate de tener `django-payments` instalado, luego instala `django-payments-chile`:
-
 ```bash
-pip install django-payments django-payments-chile
+pip install django-payments-chile[chile]
 ```
+
+- **flow**: Instala extras para Flow.
+- **khipu**: Instala extras para Khipu.
+- **todos**: Instala todos los extras.
 
 ### Configuración
 
@@ -46,16 +48,6 @@ PAYMENT_VARIANTS = {
 }
 ```
 
-Asegúrate de haber agregado `payments` a `INSTALLED_APPS`:
-
-```python
-INSTALLED_APPS = [
-    ...,
-    'payments',
-    'payments_chile',
-]
-```
-
 ### Creación de un nuevo pago
 
 Con django-payments ya configurado, puedes crear un nuevo pago utilizando los métodos nativos de la librería:
@@ -66,7 +58,7 @@ from payments import get_payment_model
 Payment = get_payment_model()
 
 payment = Payment.objects.create(
-    variant='flow',  # o 'webpay', 'khipu', etc.
+    variant='flow',  # o 'webpay', 'khipu', debe coincidir con el indice en PAYMENT_VARIANTS
     description="Pago por Orden #123",
     total=10000,
     currency='CLP',
