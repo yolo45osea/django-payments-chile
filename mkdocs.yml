@@ -1,0 +1,69 @@
+site_name: Django Payments Chile
+repo_url: https://github.com/mariofix/django-payments-chile
+repo_name: django-payments-chile
+
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: deep purple
+    accent: teal
+  font:
+    text: Roboto
+  language: es
+  icon:
+    logo: material/alpha-k-box-outline
+    repo: fontawesome/brands/github
+  features:
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+    - search.share
+
+plugins:
+  - git-committers:
+      repository: mariofix/django-payments-chile
+      branch: main
+      enabled: true
+  - mkdocstrings
+  - search
+
+nav:
+  - Inicio: index.md
+  - Uso: uso.md
+  - Integraciones: providers.md
+  - Referencia: api.md
+  - Colabora: contributing.md
+  - Cambios: CHANGELOG.md
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - tables
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.smartsymbols
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tabbed:
+      alternate_style: true

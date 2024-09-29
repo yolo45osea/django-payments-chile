@@ -1,0 +1,84 @@
+name: New Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  crosscheck:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+        poetry-version: ["1.8.3"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set Up Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install django-payments-flow
+        run: poetry install --with dev
+      - name: Run Tests
+        run: poetry run pytest
+
+  docs:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+        poetry-version: ["1.8.3"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    needs: crosscheck
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set Up Poetry
+        uses: abatilo/actions-poetry@v3
+        with:
+          poetry-version: ${{ matrix.poetry-version }}
+      - name: Install django-payments-chile
+        run: poetry install --with dev
+      - name: Deploy Docs
+        run: poetry run mkdocs gh-deploy --force
+
+  pypi-publish:
+    name: Build and Upload
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10"]
+        poetry-version: ["1.8.3"]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    needs: crosscheck
+    environment:
+      name: pypi
+      url: https://pypi.org/p/django-payments-chile
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+      - name: Set Up Poetry
+        uses: abatilo/actions-poetry@v3
+      - name: Install django-payments-chile
+        run: poetry install --with dev
+      - name: Build django-payments-chile
+        run: poetry build
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
