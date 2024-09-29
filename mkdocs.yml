@@ -1,8 +1,8 @@
-site_name: Django Payments Chile
+site_name: django-payments-chile
 repo_url: https://github.com/mariofix/django-payments-chile
 repo_name: mariofix/django-payments-chile
 site_url: https://mariofix.github.io/django-payments-chile
-site_description: Documentacion para Django Payments
+site_description: Pasarelas de pago chilenas para django-payments
 site_author: mariofix <yo@mariofix.com>
 copyright: "MIT License"
 edit_uri: ""
@@ -17,7 +17,7 @@ theme:
     text: Roboto
   language: es
   icon:
-    logo: material/alpha-k-box-outline
+    logo: material/contactless-payment
     repo: fontawesome/brands/github
   features:
     - navigation.tracking
@@ -30,10 +30,10 @@ theme:
     - search.share
 
 plugins:
-  - git-committers:
-      repository: mariofix/django-payments-chile
-      branch: main
-      enabled: true
+  # - git-committers:
+  #     repository: mariofix/django-payments-chile
+  #     branch: main
+  #     enabled: true
   - mkdocstrings
   - search
 

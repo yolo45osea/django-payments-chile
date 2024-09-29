@@ -1,6 +1,6 @@
 # django-payments-chile
 
-**django-payments-chile** es una librería diseñada para facilitar la integración de pagos en aplicaciones Django a través de múltiples proveedores en Chile. Este proyecto ofrece una API simple y flexible para procesar pagos de manera segura, permitiendo a los desarrolladores concentrarse en construir sus aplicaciones sin complicarse con la lógica de integración de cada proveedor.
+`django-payments-chile` es una extensión para `django-payments`, una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
 
 ![PyPI - Status](https://img.shields.io/pypi/status/django-payments-chile)
 [![Downloads](https://pepy.tech/badge/django-payments-chile)](https://pepy.tech/project/django-payments-chile)

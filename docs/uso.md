@@ -1,53 +1,71 @@
-# ¿Qué es django-payments-chile?
+# Introducción a `django-payments-chile`
 
-`django-payments-chile` es una extensión de Django que te permite procesar pagos en Chile fácilmente. Funciona con `django-payments`, que es una biblioteca más general para manejar pagos en Django.
+`django-payments-chile` es una extensión para `django-payments`, una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
 
-## Paso 1: Preparar tu entorno
+Al ser una extensión de `django-payments`, su objetivo es facilitar la integración de múltiples proveedores de pago sin necesidad de que desarrolles un sistema desde cero para cada uno.
 
-Antes de empezar, asegúrate de tener:
+!!! note "TL;DR"
+    Si prefieres ver una implementación de ejemplo y comenzar rápidamente, puedes clonar el [Repositorio de ejemplo](https://github.com/mariofix/django-payments-chile/tree/main/ejemplo):
 
-1. Python instalado en tu computadora.
-2. Django instalado y un proyecto Django creado.
+## Requisitos
 
-Si no tienes Django, puedes instalarlo con:
+Antes de empezar, asegúrate de tener lo siguiente:
+
+- **Python** instalado en tu sistema.
+- **Django** para gestionar la aplicación web.
+- **django-payments** como el núcleo para gestionar los pagos.
+- **django-payments-chile** para integrar proveedores de pago en Chile.
+
+## Instalación
+
+### Instalación con Poetry
+
+1. Crea un nuevo proyecto y entorno virtual con Poetry:
+
+    ```bash
+    poetry new mi-tienda
+    cd mi-tienda
+    poetry env use python3.10  # Reemplaza con la versión de Python que prefieras
+    ```
+
+2. Instala Django, `django-payments` y `django-payments-chile`:
+
+    ```bash
+    poetry add django django-payments django-payments-chile
+    poetry install
+    ```
+
+!!! note
+    Al instalar `django-payments-chile`, sus dependencias, como `django-payments` y `django`, se instalarán automáticamente.
+
+## Configuración del Proyecto
+
+### Crear el Proyecto
+
+Inicia un nuevo proyecto de Django y una aplicación para gestionar los pagos:
 
 ```bash
-pip install django
+poetry run django-admin startproject tienda .
+poetry run django-admin startapp pagos
 ```
 
-Y crear un nuevo proyecto Django con:
+### Modificar `settings.py`
 
-```bash
-django-admin startproject miproyecto
-cd miproyecto
-```
-
-## Paso 2: Instalar las bibliotecas necesarias
-
-Ahora, vamos a instalar `django-payments` y `django-payments-chile`:
-
-```bash
-pip install django-payments django-payments-chile
-```
-
-## Paso 3: Configurar tu proyecto Django
-
-### 3.1 Modificar settings.py
-
-Abre el archivo `settings.py` en tu proyecto Django y agrega estas líneas:
+Abre el archivo `settings.py` de tu proyecto y agrega las siguientes configuraciones de `django-payments`:
 
 ```python
 INSTALLED_APPS = [
-    # ... tus otras apps ...
-    "payments",
+    # Otras aplicaciones de tu proyecto...
+    "payments",  # Core de django-payments
+    "pagos",  # Tu app personalizada para manejar pagos
 ]
 
-# Configuración para payments
-PAYMENT_HOST = 'tudominio.cl'  # Cambia esto por tu dominio real
-PAYMENT_USES_SSL = True  # Usa False si no tienes HTTPS
-PAYMENT_MODEL = 'pagos.modelos.Pago'
+# Configuración de django-payments
+PAYMENT_HOST = 'mi-tienda.cl'  # Reemplaza con tu dominio
+PAYMENT_USES_SSL = True  # Usa True si tienes HTTPS, False en caso contrario
+PAYMENT_MODEL = 'pagos.modelos.Pago'  # Modelo personalizado para pagos
 
-# Configuración para django-payments-chile (ejemplo con Flow)
+# Configuración para proveedores chilenos (ejemplo con Flow)
 PAYMENT_VARIANTS = {
     "flow": ("django_payments_chile.FlowProvider", {
         "api_key": "tu_api_key_de_flow",
@@ -56,24 +74,25 @@ PAYMENT_VARIANTS = {
 }
 ```
 
-Nota: Reemplaza 'tudominio.cl', 'tu_api_key_de_flow' y 'tu_api_secret_de_flow' con tus datos reales.
+!!! note
+    Asegúrate de reemplazar `'mi-tienda.cl'`, `'tu_api_key_de_flow'` y `'tu_api_secret_de_flow'` con tus datos reales.
 
-### 3.2 Modificar urls.py
+### Modificar `urls.py`
 
-Abre el archivo `urls.py` principal de tu proyecto y agrega esta línea:
+Incluye las rutas necesarias en el archivo `urls.py` de tu proyecto o aplicación:
 
 ```python
 from django.urls import include, path
 
 urlpatterns = [
-    # ... tus otras URLs ...
+    # Otras rutas...
     path('payments/', include('payments.urls')),
 ]
 ```
 
-## Paso 4: Crear un modelo de pago
+## Creación del Modelo de Pago
 
-Crea un nuevo archivo llamado `modelos.py` en una app de tu proyecto (por ejemplo, en una app llamada 'pagos') y agrega este código:
+Crea el modelo de pago en el archivo `pagos/modelos.py`, que gestionará los pagos y las redirecciones según el éxito o fracaso de los mismos:
 
 ```python
 from django.conf import settings
@@ -81,30 +100,17 @@ from payments.models import BasePayment
 
 class Pago(BasePayment):
     def get_failure_url(self) -> str:
+        # Redirige a esta URL si el pago falla
         return f"https://{settings.PAYMENT_HOST}/payments/{self.pk}/failure"
 
     def get_success_url(self) -> str:
+        # Redirige a esta URL si el pago es exitoso
         return f"https://{settings.PAYMENT_HOST}/payments/{self.pk}/success"
 ```
 
-No olvides crear la app 'pagos' si no existe:
+## Implementación en las Vistas
 
-```bash
-python manage.py startapp pagos
-```
-
-Y agrégala a INSTALLED_APPS en settings.py:
-
-```python
-INSTALLED_APPS = [
-    # ... otras apps ...
-    "pagos",
-]
-```
-
-## Paso 5: Usar django-payments-chile en tu vista
-
-Ahora puedes usar django-payments-chile en tus vistas. Aquí tienes un ejemplo:
+Usa `django-payments` en tus vistas para procesar pagos con los distintos proveedores. Aquí tienes un ejemplo de cómo crear y procesar un pago:
 
 ```python
 from django.shortcuts import redirect
@@ -113,7 +119,7 @@ from payments import get_payment_model
 def crear_pago(request):
     Payment = get_payment_model()
     payment = Payment.objects.create(
-        variant='flow',  # Esto debe coincidir con lo que pusiste en PAYMENT_VARIANTS
+        variant='flow',  # Debe coincidir con el nombre en PAYMENT_VARIANTS
         description="Pago por Orden #123",
         total=10000,  # Monto en centavos (100 pesos)
         currency='CLP',
@@ -121,18 +127,13 @@ def crear_pago(request):
         billing_last_name='Pérez',
         billing_email='juan.perez@example.com',
     )
+    # Redirige al usuario a la URL del proveedor de pagos
     return redirect(payment.get_process_url())
 ```
 
-## Paso 6: Crear las páginas de éxito y fracaso
+## Consejos Finales
 
-No olvides crear las páginas a las que se redirigirá después del pago (éxito o fracaso). Puedes hacerlo creando nuevas vistas y templates.
-
-## Consejos finales
-
-1. Siempre prueba en un entorno de desarrollo antes de ir a producción.
-2. Mantén seguros tus datos de API (keys, secrets). No los subas a repositorios públicos.
-3. Lee la documentación oficial de django-payments y django-payments-chile para más detalles.
-4. ¡No dudes en pedir ayuda en foros de Django si te atascas!
-
-Recuerda que cada paso puede requerir más configuración dependiendo de tu proyecto específico.
+- **Pruebas**: Asegúrate de probar la implementación en un entorno de desarrollo antes de desplegarla en producción.
+- **Seguridad**: No subas tus claves de API o secretos a repositorios públicos. Utiliza archivos de entorno o servicios seguros para gestionarlos.
+- **Documentación Adicional**: Consulta la documentación oficial de [django-payments](https://django-payments.readthedocs.io/) para conocer todas las opciones y configuraciones avanzadas.
+- **Soporte**: Si tienes dudas o problemas [haz tu pregunta](https://github.com/mariofix/django-payments-chile/discussions).

@@ -1,6 +1,6 @@
 # django-payments-chile
 
-**django-payments-chile** es una extensión de **django-payments** que facilita la integración de proveedores de pago en aplicaciones Django para el mercado chileno. Actualmente soporta Flow, Khipu, Webpay, y más.
+`django-payments-chile` es una extensión para `django-payments`, una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
 
 ![PyPI - Status](https://img.shields.io/pypi/status/django-payments-flow)
 [![Downloads](https://pepy.tech/badge/django-payments-flow)](https://pepy.tech/project/django-payments-flow)
@@ -14,17 +14,21 @@
 
 ## Características
 
-- Soporte para múltiples proveedores de pago en Chile.
-- Compatible con la API de django-payments.
-- Extensión fácil de configurar.
+- Soporte para múltiples proveedores de pago en un solo proyecto.
+- API consistente para crear, procesar y verificar transacciones.
+- Fácil configuración y personalización.
+- Documentación clara para desarrolladores.
+- Soporte para eventos de éxito, fallo, y reembolsos de pagos.
 
 ## Inicio rápido
 
 ### Instalación
 
 ```bash
-pip install django-payments-chile[chile]
+pip install django-payments-chile[todos]
 ```
+
+Adicionalmente puedes instalar los extras para cada integrador:
 
 - **flow**: Instala extras para Flow.
 - **khipu**: Instala extras para Khipu.
@@ -71,8 +75,6 @@ payment = Payment.objects.create(
 redirect_url = payment.get_process_url()
 return redirect(redirect_url)
 ```
-
-**Nota**: `django-payments` manejará la redirección al proveedor y la confirmación del estado del pago. Solo necesitas configurar correctamente los proveedores.
 
 Para más detalles sobre el flujo de pago y las respuestas de los proveedores, consulta la sección [configuración](configuration.md).
 
