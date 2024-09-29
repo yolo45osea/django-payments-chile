@@ -2,6 +2,16 @@
 
 **django-payments-chile** es una extensión de **django-payments** que facilita la integración de proveedores de pago en aplicaciones Django para el mercado chileno. Actualmente soporta Flow, Khipu, Webpay, y más.
 
+![PyPI - Status](https://img.shields.io/pypi/status/django-payments-flow)
+[![Downloads](https://pepy.tech/badge/django-payments-flow)](https://pepy.tech/project/django-payments-flow)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/7dc3c8d6fe844fdaa1de0cb86c242934)](https://app.codacy.com/gh/mariofix/django-payments-flow/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/7dc3c8d6fe844fdaa1de0cb86c242934)](https://app.codacy.com/gh/mariofix/django-payments-flow/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mariofix/django-payments-flow/main.svg)](https://results.pre-commit.ci/latest/github/mariofix/django-payments-flow/main)
+![PyPI](https://img.shields.io/pypi/v/django-payments-flow)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-flow)
+![PyPI - Implementation](https://img.shields.io/pypi/implementation/django-payments-flow)
+![PyPI - License](https://img.shields.io/pypi/l/django-payments-flow)
+
 ## Características
 
 - Soporte para múltiples proveedores de pago en Chile.

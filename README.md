@@ -1,9 +1,14 @@
 # django-payments-chile
 
-![Python Version](https://img.shields.io/badge/python-3.7%2B-blue)
-![Django Version](https://img.shields.io/badge/django-3.2%2B-green)
-![License](https://img.shields.io/badge/license-MIT-brightgreen)
-![Contributions Welcome](https://img.shields.io/badge/contributions-welcome-brightgreen)
+![PyPI - Status](https://img.shields.io/pypi/status/django-payments-chile)
+[![Downloads](https://pepy.tech/badge/django-payments-chile)](https://pepy.tech/project/django-payments-chile)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/7dc3c8d6fe844fdaa1de0cb86c242934)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mariofix/django-payments-chile/main.svg)](https://results.pre-commit.ci/latest/github/mariofix/django-payments-chile/main)
+![PyPI](https://img.shields.io/pypi/v/django-payments-chile)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-chile)
+![PyPI - Implementation](https://img.shields.io/pypi/implementation/django-payments-chile)
+![PyPI - License](https://img.shields.io/pypi/l/django-payments-chile)
 
 **django-payments-chile** es una librería diseñada para facilitar la integración de pagos en aplicaciones Django a través de múltiples proveedores en Chile. Este proyecto ofrece una API simple y flexible para procesar pagos de manera segura, permitiendo a los desarrolladores concentrarse en construir sus aplicaciones sin complicarse con la lógica de integración de cada proveedor.
 
