@@ -1,15 +1,28 @@
 [tool.poetry]
 name = "django-payments-chile"
-version = "2024.9.29"
-description = "ConecConexiones de los procesadores de pago mas conocidos en Chile para Django Payments"
+version = "2024.9.30"
+description = "Pasarelas de pago chilenas para django-payments"
 authors = ["Mario Hernandez <mariofix@proton.me>"]
 license = "MIT"
 readme = "README.md"
-packages = [{ include = "django_payments_chile" }]
+packages = [{ include = "django_payments_chile" }, { include = "tests" }]
 repository = "https://github.com/mariofix/django-payments-chile"
 documentation = "https://mariofix.github.io/django-payments-chile/"
 homepage = "https://mariofix.github.io/django-payments-chile/"
-keywords = ["flow", "pagos", "django", "payment", "django-payments"]
+keywords = [
+    "flow",
+    "khipu",
+    "kushki",
+    "transbank",
+    "payku",
+    "pagofacil",
+    "webpay",
+    "onepay",
+    "pagos",
+    "django",
+    "payment",
+    "django-payments",
+]
 classifiers = [
     "Development Status :: 4 - Beta",
     "License :: OSI Approved :: MIT License",
@@ -55,7 +68,6 @@ mkdocs = "^1.4.3"
 mkdocs-material = "^9.5.39"
 mkdocstrings = { extras = ["python"], version = ">=0.22,<0.27" }
 mkdocs-git-revision-date-localized-plugin = "^1.2.0"
-mkdocs-git-committers-plugin-2 = ">=1.1.2,<3.0.0"
 pillow = "^10.0.0"
 cairosvg = "^2.7.0"
 lxml = ">=4.9.3,<6.0.0"
@@ -70,7 +82,7 @@ tox-gh-actions = "^3.1.3"
 
 [tool.pytest.ini_options]
 # DJANGO_SETTINGS_MODULE = "tests.django_settings"
-addopts = "--cov=django_payments_flow/ --cov-branch --cov-report=term-missing --cov-report=xml"
+addopts = "--cov=django_payments_chile/ --cov-branch --cov-report=term-missing --cov-report=xml"
 
 [tool.black]
 line-length = 119
@@ -81,7 +93,7 @@ profile = "black"
 line_length = 119
 multi_line_output = 5
 py_version = 39
-src_paths = ["django_payments_chile", "tests", "sandbox"]
+src_paths = ["django_payments_chile", "tests", "ejemplo"]
 
 
 [build-system]
