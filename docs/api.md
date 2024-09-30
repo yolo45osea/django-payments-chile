@@ -4,14 +4,14 @@ Este documento proporciona una visión general de los diferentes proveedores de 
 
 Para obtener detalles sobre cada proveedor, consulte los siguientes enlaces:
 
--   [FlowProvider](flow-provider.md)
--   [KhipuProvider](khipu-provider.md)
--   [KlapProvider](klap-provider.md)
--   [KushkiProvider](kushki-provider.md)
--   [OneclickProvider](oneclick-provider.md)
--   [PagofacilProvider](pagofacil-provider.md)
--   [PaykuProvider](payku-provider.md)
--   [WebpayProvider](webpay-provider.md)
+- [FlowProvider](flow-provider.md)
+- [KhipuProvider](khipu-provider.md)
+- [KlapProvider](klap-provider.md)
+- [KushkiProvider](kushki-provider.md)
+- [OneclickProvider](oneclick-provider.md)
+- [PagofacilProvider](pagofacil-provider.md)
+- [PaykuProvider](payku-provider.md)
+- [WebpayProvider](webpay-provider.md)
 
 Cada enlace lo llevará a una documentación detallada sobre la implementación y uso de ese proveedor específico.
 
@@ -21,9 +21,9 @@ El FlowProvider es una implementación para integrar la pasarela de pagos Flow e
 
 ### Métodos principales
 
--   `__init__(self, **kwargs)`: Inicializa el proveedor con las configuraciones necesarias.
--   `get_form(self, payment, data=None)`: Retorna el formulario para iniciar el proceso de pago.
--   `process_data(self, payment, request)`: Procesa los datos recibidos de Flow después de un pago.
+- `__init__(self, **kwargs)`: Inicializa el proveedor con las configuraciones necesarias.
+- `get_form(self, payment, data=None)`: Retorna el formulario para iniciar el proceso de pago.
+- `process_data(self, payment, request)`: Procesa los datos recibidos de Flow después de un pago.
 
 #### Configuración
 
