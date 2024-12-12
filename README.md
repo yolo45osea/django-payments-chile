@@ -2,6 +2,8 @@
 
 `django-payments-chile` es una extensión para `django-payments`, una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
 
+:warning: :warning: **Este proyecto está en desarrollo activo**, usar con precaución. :warning: :warning:
+
 ![PyPI - Status](https://img.shields.io/pypi/status/django-payments-chile)
 [![Downloads](https://pepy.tech/badge/django-payments-chile)](https://pepy.tech/project/django-payments-chile)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
@@ -14,13 +16,15 @@
 
 ## Proveedores de pago soportados
 
-- **Flow**: Plataforma chilena para pagos en línea que admite múltiples métodos de pago.
-- **Khipu**: Permite pagos mediante transferencia electrónica en tiempo real.
-- **Klap**: Solución de pagos electrónicos enfocados en comercios.
-- **Kushki**: Proveedor de pagos electrónicos que facilita la integración con diversas plataformas.
-- **Payku**: Plataforma de pagos enfocada en pequeñas y medianas empresas.
-- **Webpay**: El sistema de pago en línea más utilizado en Chile, operado por Transbank.
-- **Onepay**: Pago rápido y seguro usando códigos QR.
+| Proveedor | Estado | Descripcion |
+| --- | --- | --- |
+| Flow | :white_check_mark: | Plataforma chilena para pagos en línea que admite múltiples métodos de pago. |
+| Khipu | :x: | Permite pagos mediante transferencia electrónica en tiempo real. |
+| Klap | :x: | Solución de pagos electrónicos enfocados en comercios. |
+| Kushki | :x: | Proveedor de pagos electrónicos que facilita la integración con diversas plataformas. |
+| Onepay | :x: | Pago rápido y seguro usando códigos QR. |
+| Payku | :x: | Plataforma de pagos enfocada en pequeñas y medianas empresas. |
+| Webpay | :x: | El sistema de pago en línea más utilizado en Chile, operado por Transbank. |
 
 ## Características
 
@@ -39,7 +43,6 @@ pip install django-payments-chile[todos]
 ```
 
 - **flow**: Instala extras para Flow.
-- **khipu**: Instala extras para Khipu.
 - **todos**: Instala todos los extras.
 
 ### Configuración de Proveedores
@@ -58,10 +61,6 @@ PAYMENT_VARIANTS = {
     }),
 }
 ```
-
-## Uso
-
-AGREGAR INSTALACION Y PASOS DE CONFIGURACION DE DJANGO-PAYMETNTS
 
 ## Licencia
 

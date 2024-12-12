@@ -214,7 +214,7 @@ class PaykuProvider(BasicProvider):
                 "commerceTrxId": payment.token,
                 "flowTrxId": payment.attrs.respuesta_flow["flowOrder"],
             }
-            refund = FlowRefund.create(self._client, datos_reembolso)
+            refund = datos_reembolso
         except Exception as pe:
             raise PaymentError(pe)
         else:
