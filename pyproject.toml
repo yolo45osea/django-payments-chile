@@ -41,7 +41,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["django-payments>=2.0, <4.0", "requests"]
+dependencies = ["django-payments>=2.0, <4.0", "requests", "pyflowcl"]
 
 [project.urls]
 Homepage = "https://mariofix.github.io/django-payments-chile/"
@@ -78,11 +78,7 @@ dev = [
 
 
 [tool.setuptools.packages.find]
-include = ["django_payments_chile", "tests", "ejemplo"]
-
-[tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tests.django_settings"
-addopts = "--cov=django_payments_chile/ --cov-branch --cov-report=term-missing --cov-report=xml"
+include = ["django_payments_chile", "tests"]
 
 [tool.black]
 line-length = 119
@@ -93,4 +89,22 @@ profile = "black"
 line_length = 119
 multi_line_output = 5
 py_version = 39
-src_paths = ["django_payments_chile", "tests", "ejemplo"]
+src_paths = ["django_payments_chile", "tests"]
+
+
+[tool.coverage.report]
+exclude_lines = ["if TYPE_CHECKING:"]
+
+[tool.django-stubs]
+django_settings_module = "tests.django_settings"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--cov=django_payments_chile",
+    "--cov-report=term-missing:skip-covered",
+    "--no-cov-on-fail",
+    "--color=yes",
+]
+testpaths = "tests"
+DJANGO_SETTINGS_MODULE = "tests.django_settings"
+pythonpath = "."
