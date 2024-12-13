@@ -7,7 +7,7 @@
 ![PyPI - Status](https://img.shields.io/pypi/status/django-payments-chile)
 [![Downloads](https://pepy.tech/badge/django-payments-chile)](https://pepy.tech/project/django-payments-chile)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/7dc3c8d6fe844fdaa1de0cb86c242934)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mariofix/django-payments-chile/main.svg)](https://results.pre-commit.ci/latest/github/mariofix/django-payments-chile/main)
 ![PyPI](https://img.shields.io/pypi/v/django-payments-chile)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-chile)
@@ -19,7 +19,7 @@
 | Proveedor | Estado | Descripcion |
 | --- | --- | --- |
 | Flow | :white_check_mark: | Plataforma chilena para pagos en línea que admite múltiples métodos de pago. |
-| Khipu | :x: | Permite pagos mediante transferencia electrónica en tiempo real. |
+| Khipu | :white_check_mark: | Permite pagos mediante transferencia electrónica en tiempo real. |
 | Klap | :x: | Solución de pagos electrónicos enfocados en comercios. |
 | Kushki | :x: | Proveedor de pagos electrónicos que facilita la integración con diversas plataformas. |
 | Onepay | :x: | Pago rápido y seguro usando códigos QR. |
