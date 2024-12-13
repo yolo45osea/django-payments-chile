@@ -90,7 +90,7 @@ class FlowProvider(BasicProvider):
             firma_datos = ...
             datos_para_flow.update({"s": firma_datos})
             try:
-                pago_req = requests.post(f"{self.api_endpoint}/payment/create", data=datos_para_flow)
+                pago_req = requests.post(f"{self.api_endpoint}/payment/create", data=datos_para_flow, timeout=5)
                 pago_req.raise_for_status()
 
             except Exception as pe:
@@ -140,7 +140,7 @@ class FlowProvider(BasicProvider):
         """
         try:
             # status = FlowPayment.getStatus(self._client, payment.transaction_id)
-            estado_req = requests.post(f"{self.api_endpoint}/payment/getStatus")
+            estado_req = requests.post(f"{self.api_endpoint}/payment/getStatus", timeout=5)
             estado_req.raise_for_status()
 
         except Exception as e:

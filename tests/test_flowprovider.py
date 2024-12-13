@@ -5,8 +5,8 @@ from payments import PaymentStatus, RedirectNeeded
 
 from django_payments_chile.FlowProvider import FlowProvider
 
-API_KEY = "flow_test_key"
-API_SECRET = "flow_test_secret"
+API_KEY = "flow_test_key"  # nosec
+API_SECRET = "flow_test_secret"  # nosec
 
 
 class payment_attrs:

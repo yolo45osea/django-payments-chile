@@ -8,7 +8,7 @@ TEMPLATES = [
     }
 ]
 USE_TZ = True
-SECRET_KEY = "NOTREALLY"
+SECRET_KEY = "NOTREALLY"  # nosec
 PAYMENT_HOST = "example.com"
 
 INSTALLED_APPS = ["payments", "django.contrib.sites"]
