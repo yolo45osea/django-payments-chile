@@ -7,10 +7,6 @@ from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_base_url
 from payments.forms import PaymentForm as BasePaymentForm
 
-# from pyflowcl import Payment as FlowPayment
-# from pyflowcl import Refund as FlowRefund
-# from pyflowcl.Clients import ApiClient
-
 
 class FlowProvider(BasicProvider):
     """
