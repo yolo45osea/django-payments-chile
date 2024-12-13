@@ -1,8 +1,7 @@
 from dataclasses import asdict
 from typing import Any, Optional
-from urllib import request
-import requests
 
+import requests
 from django.http import HttpResponseBadRequest, JsonResponse
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_base_url
@@ -215,7 +214,7 @@ class FlowProvider(BasicProvider):
                 "commerceTrxId": payment.token,
                 "flowTrxId": payment.attrs.respuesta_flow["flowOrder"],
             }
-            refund = FlowRefund.create(self._client, datos_reembolso)
+            refund = datos_reembolso  # FlowRefund.create(self._client, datos_reembolso)
         except Exception as pe:
             raise PaymentError(pe)
         else:

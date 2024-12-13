@@ -1,9 +1,7 @@
 from unittest import TestCase
-from unittest.mock import Mock
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
-from payments import PaymentStatus
-from payments import RedirectNeeded
+from payments import PaymentStatus, RedirectNeeded
 
 from django_payments_chile.FlowProvider import FlowProvider
 
@@ -46,6 +44,10 @@ class Payment(Mock):
         return "http://mi-app.cl/exito"
 
 
+class TestException(Exception):
+    pass
+
+
 class TestFlowProviderV3(TestCase):
     def test_provider_create_session_success(self):
         payment = Payment()
@@ -71,10 +73,10 @@ class TestFlowProviderV3(TestCase):
         with patch("django_payments_chile.FlowProvider.requests.post") as mock_post:
             # Simulate an error response
             mock_response = Mock()
-            mock_response.raise_for_status.side_effect = Exception("Error occurred")
+            mock_response.raise_for_status.side_effect = TestException("Error occurred")
             mock_post.return_value = mock_response
 
-            with self.assertRaises(Exception):
+            with self.assertRaises(TestException):
                 provider.get_form(payment)
 
             self.assertEqual(payment.status, PaymentStatus.ERROR)
