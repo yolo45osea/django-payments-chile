@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-payments-chile"
-version = "2024.12.2a"
+version = "2024.12.3b"
 description = "Pasarelas de pago chilenas para django-payments"
 readme = "README.md"
 authors = [{ "name" = "Mario Hernandez", "email" = "mariofix@proton.me" }]
@@ -33,7 +33,6 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
     "Intended Audience :: Developers",
     "Intended Audience :: Information Technology",
     "Topic :: Software Development :: Libraries :: Python Modules",
@@ -41,7 +40,7 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 
-dependencies = ["django-payments>=2.0, <4.0", "requests", "pyflowcl"]
+dependencies = ["django-payments>=2.0, <4.0", "requests"]
 
 [project.urls]
 Homepage = "https://mariofix.github.io/django-payments-chile/"
