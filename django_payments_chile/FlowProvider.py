@@ -1,13 +1,16 @@
 from dataclasses import asdict
 from typing import Any, Optional
+from urllib import request
+import requests
 
 from django.http import HttpResponseBadRequest, JsonResponse
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_base_url
 from payments.forms import PaymentForm as BasePaymentForm
-from pyflowcl import Payment as FlowPayment
-from pyflowcl import Refund as FlowRefund
-from pyflowcl.Clients import ApiClient
+
+# from pyflowcl import Payment as FlowPayment
+# from pyflowcl import Refund as FlowRefund
+# from pyflowcl.Clients import ApiClient
 
 
 class FlowProvider(BasicProvider):
@@ -28,13 +31,12 @@ class FlowProvider(BasicProvider):
     api_key: str = None
     api_secret: str = None
     api_medio: int
-    _client: Any = None
 
     def __init__(
         self,
-        api_endpoint: str,
         api_key: str,
         api_secret: str,
+        api_endpoint: str = "live",
         api_medio: int = 9,
         **kwargs: int,
     ):
@@ -47,7 +49,6 @@ class FlowProvider(BasicProvider):
             self.api_endpoint = "https://www.flow.cl/api"
         elif self.api_endpoint == "sandbox":
             self.api_endpoint = "https://sandbox.flow.cl/api"
-        self._client = ApiClient(self.api_endpoint, self.api_key, self.api_secret)
 
     def get_form(self, payment, data: Optional[dict] = None) -> Any:
         """
@@ -87,23 +88,27 @@ class FlowProvider(BasicProvider):
             except Exception as e:
                 raise PaymentError(f"Ocurrió un error al guardar attrs.datos_flow: {e}")
 
+            firma_datos = ...
+            datos_para_flow.update({"s": firma_datos})
             try:
-                pago = FlowPayment.create(self._client, datos_para_flow)
+                pago_req = requests.post(f"{self.api_endpoint}/payment/create", data=datos_para_flow)
+                pago_req.raise_for_status()
 
             except Exception as pe:
                 payment.change_status(PaymentStatus.ERROR, str(pe))
                 raise PaymentError(pe)
             else:
-                payment.transaction_id = pago.token
+                pago = pago_req.json()
+                payment.transaction_id = pago["token"]
                 payment.attrs.respuesta_flow = {
-                    "url": pago.url,
-                    "token": pago.token,
-                    "flowOrder": pago.flowOrder,
+                    "url": pago["url"],
+                    "token": pago["token"],
+                    "flowOrder": pago["flowOrder"],
                 }
                 payment.save()
                 payment.change_status(PaymentStatus.WAITING)
 
-            raise RedirectNeeded(f"{pago.url}?token={pago.token}")
+            raise RedirectNeeded(f"{pago['url']}?token={pago['token']}")
 
     def process_data(self, payment, request) -> JsonResponse:
         """
@@ -120,11 +125,10 @@ class FlowProvider(BasicProvider):
         if "token" not in request.POST:
             raise HttpResponseBadRequest("token no está en post")
 
-        data = {"status": "ok"}
         if payment.status in [PaymentStatus.WAITING, PaymentStatus.PREAUTH]:
             self.actualiza_estado(payment=payment)
 
-        return JsonResponse(data)
+        return JsonResponse({"status": "ok"})
 
     def actualiza_estado(self, payment) -> dict:
         """Actualiza el estado del pago con Flow
@@ -136,10 +140,14 @@ class FlowProvider(BasicProvider):
             dict: Diccionario con valores del objeto `PaymentStatus`.
         """
         try:
-            status = FlowPayment.getStatus(self._client, payment.transaction_id)
+            # status = FlowPayment.getStatus(self._client, payment.transaction_id)
+            estado_req = requests.post(f"{self.api_endpoint}/payment/getStatus")
+            estado_req.raise_for_status()
+
         except Exception as e:
             raise e
         else:
+            status = estado_req.json()
             if status.status == 2:
                 payment.change_status(PaymentStatus.CONFIRMED)
             elif status.status == 3:

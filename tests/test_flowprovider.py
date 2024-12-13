@@ -5,7 +5,7 @@ from unittest.mock import patch
 from payments import PaymentStatus
 from payments import RedirectNeeded
 
-from django_payments_chile import FlowProvider
+from django_payments_chile.FlowProvider import FlowProvider
 
 API_KEY = "flow_test_key"
 API_SECRET = "flow_test_secret"
@@ -46,14 +46,58 @@ class Payment(Mock):
         return "http://mi-app.cl/exito"
 
 
-class TestStripeProviderV3(TestCase):
+class TestFlowProviderV3(TestCase):
     def test_provider_create_session_success(self):
         payment = Payment()
         provider = FlowProvider(api_key=API_KEY, api_secret=API_SECRET)
-        return_value = {"url": "https://flow.cl", "token": "TOKEN_ID", "flowOrder": "ORDER_ID"}
-        with patch("stripe.checkout.Session.create", return_value=return_value):
+        with patch("django_payments_chile.FlowProvider.requests.post") as mock_post:
+            # Configure mock response
+            mock_response = Mock()
+            mock_response.raise_for_status.return_value = None  # Simulates no exception raised
+            mock_response.json.return_value = {"url": "https://flow.cl", "token": "TOKEN_ID", "flowOrder": "ORDER_ID"}
+            mock_post.return_value = mock_response
+
             with self.assertRaises(RedirectNeeded):
                 provider.get_form(payment)
-                self.assertTrue("url" in payment.attrs.session)
-                self.assertTrue("token" in payment.attrs.session)
-        self.assertEqual(payment.status, PaymentStatus.WAITING)
+
+            self.assertEqual(payment.status, PaymentStatus.WAITING)
+            self.assertEqual(payment.attrs.respuesta_flow["url"], "https://flow.cl")
+            self.assertEqual(payment.attrs.respuesta_flow["token"], "TOKEN_ID")
+            self.assertEqual(payment.attrs.respuesta_flow["flowOrder"], "ORDER_ID")
+
+    def test_provider_create_session_error(self):
+        payment = Payment()
+        provider = FlowProvider(api_key=API_KEY, api_secret=API_SECRET)
+        with patch("django_payments_chile.FlowProvider.requests.post") as mock_post:
+            # Simulate an error response
+            mock_response = Mock()
+            mock_response.raise_for_status.side_effect = Exception("Error occurred")
+            mock_post.return_value = mock_response
+
+            with self.assertRaises(Exception):
+                provider.get_form(payment)
+
+            self.assertEqual(payment.status, PaymentStatus.ERROR)
+            self.assertIn("Error occurred", payment.message)
+
+    def test_provider_change_status(self):
+        payment = Payment()
+        payment.change_status(PaymentStatus.CONFIRMED, "Payment successful")
+
+        self.assertEqual(payment.status, PaymentStatus.CONFIRMED)
+        self.assertEqual(payment.message, "Payment successful")
+
+    def test_provider_transaction_id_set(self):
+        payment = Payment()
+        provider = FlowProvider(api_key=API_KEY, api_secret=API_SECRET)
+        with patch("django_payments_chile.FlowProvider.requests.post") as mock_post:
+            # Configure mock response with transaction ID
+            mock_response = Mock()
+            mock_response.raise_for_status.return_value = None
+            mock_response.json.return_value = {"url": "https://flow.cl", "token": "TOKEN_ID", "flowOrder": "ORDER_ID"}
+            mock_post.return_value = mock_response
+
+            with self.assertRaises(RedirectNeeded):
+                provider.get_form(payment)
+
+            self.assertEqual(payment.transaction_id, "TOKEN_ID")
