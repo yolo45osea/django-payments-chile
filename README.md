@@ -9,6 +9,7 @@
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mariofix/django-payments-chile/main.svg)](https://results.pre-commit.ci/latest/github/mariofix/django-payments-chile/main)
+[![Tests & Coverage](https://github.com/mariofix/django-payments-chile/actions/workflows/tests_coverage.yml/badge.svg?branch=main)](https://github.com/mariofix/django-payments-chile/actions/workflows/tests_coverage.yml)
 ![PyPI](https://img.shields.io/pypi/v/django-payments-chile)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-chile)
 ![PyPI - Implementation](https://img.shields.io/pypi/implementation/django-payments-chile)
