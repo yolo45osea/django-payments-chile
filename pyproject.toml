@@ -1,10 +1,14 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "django-payments-chile"
 version = "2024.12.2"
 description = "Pasarelas de pago chilenas para django-payments"
 readme = "README.md"
 authors = [{ "name" = "Mario Hernandez", "email" = "mariofix@proton.me" }]
-license = { text = "MIT" }
+license = { text = "MIT License" }
 requires-python = ">=3.9,<4.0"
 
 keywords = [
@@ -40,19 +44,15 @@ classifiers = [
 dependencies = ["django-payments>=2.0, <4.0", "requests"]
 
 [project.urls]
-homepage = "https://mariofix.github.io/django-payments-chile/"
-repository = "https://github.com/mariofix/django-payments-chile"
-documentation = "https://mariofix.github.io/django-payments-chile/"
+Homepage = "https://mariofix.github.io/django-payments-chile/"
+Repository = "https://github.com/mariofix/django-payments-chile"
+Documentation = "https://mariofix.github.io/django-payments-chile/"
 
 
 [project.optional-dependencies]
-flow = ["pyflowcl"]
-khipu = ["pykhipu"]
 webpay = ["transbank-sdk>=5.0.0"]
 oneclick = ["transbank-sdk>=5.0.0"]
-todos = ["pyflowcl", "pykhipu", "transbank-sdk>=5.0.0"]
-
-[dependency-groups]
+todos = ["transbank-sdk>=5.0.0"]
 dev = [
     "pre-commit",
     "black",
@@ -77,12 +77,8 @@ dev = [
 ]
 
 
-[build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
-
 [tool.setuptools.packages.find]
-include = ["django_payments_chile", "tests"]
+include = ["django_payments_chile", "tests", "ejemplo"]
 
 [tool.pytest.ini_options]
 # DJANGO_SETTINGS_MODULE = "tests.django_settings"

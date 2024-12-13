@@ -1,6 +1,6 @@
 # django-payments-chile
 
-`django-payments-chile` es una extensión para `django-payments`, una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
+`django-payments-chile` es una extensión para [django-payments](https://github.com/jazzband/django-payments), una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
 
 :warning: :warning: **Este proyecto está en desarrollo activo**, usar con precaución. :warning: :warning:
 
@@ -36,14 +36,40 @@
 
 ## Instalación
 
-Para instalar la librería, utiliza pip:
+La biblioteca `django-payments-chile` está disponible en PyPi. Puedes instalarla fácilmente con tu gestor de paquetes favorito, como `pip`, `poetry`, o `pipenv`.
 
 ```bash
+pip install django-payments-chile
+```
+
+### Instalación de Extras
+
+Algunos proveedores requieren dependencias adicionales para funcionar correctamente. Puedes instalar estas dependencias mediante extras:
+
+```bash
+# Instala todas las dependencias extra
 pip install django-payments-chile[todos]
 ```
 
-- **flow**: Instala extras para Flow.
-- **todos**: Instala todos los extras.
+Los extras disponibles son:
+
+- **webpay**: Incluye la dependencia `transbank-sdk`.
+- **oneclick**: También incluye `transbank-sdk`.
+- **todos**: Instala todas las dependencias extra mencionadas.
+
+Por ejemplo, para instalar solo las dependencias necesarias para Webpay, puedes ejecutar:
+
+```bash
+pip install django-payments-chile[webpay]
+```
+
+Esto es equivalente a instalar las dependencias manualmente:
+
+```bash
+pip install django-payments-chile transbank-sdk
+```
+
+**Nota**: La instalación de extras es opcional. Si prefieres, puedes gestionar las dependencias adicionales de forma manual en tu proyecto.
 
 ### Configuración de Proveedores
 
@@ -64,4 +90,6 @@ PAYMENT_VARIANTS = {
 
 ## Licencia
 
-Este proyecto está licenciado bajo la licencia [MIT](LICENSE).
+Este proyecto no está afiliado, asociado ni patrocinado por ninguna de las empresas mencionadas en el listado de compatibilidad.
+
+El código de este proyecto está disponible bajo la licencia [MIT](LICENSE), lo que significa que puedes utilizarlo, modificarlo y distribuirlo de manera libre, sujeto a las condiciones establecidas en dicha licencia.
