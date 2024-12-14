@@ -1,54 +1,43 @@
-from typing import Any
+from decimal import Decimal
+from typing import Any, Optional
 
-from django.http import JsonResponse
+import requests
+from django.http import HttpResponseBadRequest, JsonResponse
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider
-from pykhipu.client import Client
-from pykhipu.errors import AuthorizationError, ServiceError, ValidationError
+from payments.forms import PaymentForm as BasePaymentForm
 
 
 class KhipuProvider(BasicProvider):
     """
     KhipuProvider es una clase que proporciona integración con Khipu para procesar pagos.
+    Inicializa una instancia de KhipuProvider con la nueva llave de api introducida en v3
+
+    Args:
+        api_key (str): ApiKey entregada por Khipu.
+        **kwargs: Argumentos adicionales.
     """
 
-    receiver_id: str = None
-    secret: str = None
-    use_notification: str | None = "1.3"
-    bank_id: str | None = None
-    _client: Any = None
+    form_class = BasePaymentForm
+    api_endpoint: str = "https://payment-api.khipu.com"
+    api_key: str = None
 
     def __init__(
         self,
-        receiver_id: str,
-        secret: str,
-        use_notification: str | None,
-        bank_id: str | None,
-        **kwargs,
+        api_key: str,
+        api_endpoint: str,
+        **kwargs: int,
     ):
-        """
-        Inicializa una instancia de KhipuProvider con el ID de receptor y el secreto de Khipu proporcionados.
-
-        Args:
-            receiver_id (str): ID de receptor de Khipu.
-            secret (str): Secreto de Khipu.
-            use_notification (str | None): Versión de la API de notificaciones a utilizar (opcional).
-            bank_id (str | None): Id de Banco para variante (opcional).
-            **kwargs: Argumentos adicionales.
-        """
         super().__init__(**kwargs)
-        self.receiver_id = receiver_id
-        self.secret = secret
-        self.use_notification = use_notification
-        self.bank_id = bank_id
-        self._client = Client(receiver_id=receiver_id, secret=secret)
+        self.api_endpoint = api_endpoint
+        self.api_key = api_key
 
-    def get_form(self, payment, data: dict | None = None) -> Any:
+    def get_form(self, payment, data: Optional[dict] = None) -> Any:
         """
         Genera el formulario de pago para redirigir a la página de pago de Khipu.
 
         Args:
-            payment: Objeto de pago.
+            payment ("Payment"): Objeto de pago Django Payments.
             data (dict | None): Datos del formulario (opcional).
 
         Returns:
@@ -60,136 +49,163 @@ class KhipuProvider(BasicProvider):
         """
         if not payment.transaction_id:
             datos_para_khipu = {
-                "transaction_id": payment.token,
+                "transaction_id": str(payment.token),
                 "return_url": payment.get_success_url(),
-                "cancel_url": payment.get_failure_url(),
+                "notify_url": payment.get_process_url(),
+                "subject": payment.description,
+                "amount": Decimal(payment.total),
+                "currency": payment.currency,
             }
-            if self.use_notification:
-                datos_para_khipu.update({"notify_url": self.get_notification_url()})
-                datos_para_khipu.update({"notify_api_version": self.use_notification})
-
-            if self.bank_id:
-                datos_para_khipu.update({"bank_id": self.bank_id})
 
             if payment.billing_email:
                 datos_para_khipu.update({"payer_email": payment.billing_email})
 
             datos_para_khipu.update(**self._extra_data(payment.attrs))
-            try:
-                payment = self._client.payments.post(
-                    payment.description,
-                    payment.currency,
-                    int(payment.total),
-                    **datos_para_khipu,
-                )
 
-            except (ValidationError, AuthorizationError, ServiceError) as pe:
+            try:
+                payment.attrs.datos_payment_create = datos_para_khipu
+                payment.save()
+            except Exception as e:  # noqa
+                # Dificil llegar acá, y si llegamos es problema de django-payments
+                raise PaymentError(f"Ocurrió un error al guardar attrs.datos_payment_create: {e}")  # noqa
+
+            try:
+                pago_req = requests.post(
+                    f"{self.api_endpoint}/v3/payments",
+                    data=datos_para_khipu,
+                    timeout=5,
+                    headers=self.genera_headers(),
+                )
+                pago_req.raise_for_status()
+
+            except Exception as pe:
                 payment.change_status(PaymentStatus.ERROR, str(pe))
                 raise PaymentError(pe)
             else:
-                payment.transaction_id = payment.payment_id
-                payment.attrs.payment_response = payment
+                pago = pago_req.json()
+                payment.transaction_id = pago["payment_id"]
+                payment.attrs.respuesta_khipu = {
+                    "payment_id": pago["payment_id"],
+                    "payment_url": pago["payment_url"],
+                    "simplified_transfer_url": pago["simplified_transfer_url"],
+                    "transfer_url": pago["transfer_url"],
+                    "app_url": pago["app_url"],
+                    "ready_for_terminal": pago["ready_for_terminal"],
+                }
                 payment.save()
+                payment.change_status(PaymentStatus.WAITING)
 
-        if "payment_url" not in payment:
-            raise PaymentError("Khipu no envió una URL, revisa los logs en Khipu.")
+            raise RedirectNeeded(f"{pago['payment_url']}")
 
-        raise RedirectNeeded(payment.get("payment_url"))
+    def genera_headers(self):
+        return {"Content-Type": "application/json", "x-api-key": self.api_key}
 
     def process_data(self, payment, request) -> JsonResponse:
         """
         Procesa los datos del pago recibidos desde Khipu.
 
         Args:
-            payment: Objeto de pago.
-            request: Objeto de solicitud HTTP de Django.
+            payment ("Payment"): Objeto de pago Django Payments.
+            request ("HttpRequest"): Objeto de solicitud HTTP de Django.
 
         Returns:
             JsonResponse: Respuesta JSON que indica el procesamiento de los datos del pago.
 
         """
-        return JsonResponse("process_data")
+        if "transaction_id" not in request.POST:
+            raise HttpResponseBadRequest("transaction_id no está en post")
+
+        if payment.status in [PaymentStatus.WAITING, PaymentStatus.PREAUTH]:
+            self.actualiza_estado(payment=payment)
+
+        return JsonResponse({"status": "ok"})
+
+    def actualiza_estado(self, payment) -> dict:
+        """Actualiza el estado del pago con Khipu
+
+        Args:
+            payment ("Payment): Objeto de pago Django Payments.
+
+        Returns:
+            dict: Diccionario con valores del objeto `PaymentStatus`.
+        """
+        try:
+            estado_req = requests.get(
+                f"{self.api_endpoint}/v3/payments/{payment.token}",
+                timeout=5,
+                headers=self.genera_headers(),
+            )
+            estado_req.raise_for_status()
+
+        except Exception as e:
+            raise e
+        else:
+            status = estado_req.json()
+            if status["status"] == "done" and status["status_detail"] == "normal":
+                payment.change_status(PaymentStatus.CONFIRMED)
+            elif status["status_detail"] in ["rejected-by-payer", "reversed", "marked-as-abuse"]:
+                payment.change_status(PaymentStatus.REJECTED)
+        return status
 
     def _extra_data(self, attrs) -> dict:
-        if "datos_extra" not in attrs:
+        """Busca los datos que son enviandos por django-payments y los saca del diccionario
+
+        Args:
+            attrs ("PaymentAttributeProxy"): Obtenido desde PaymentModel.extra_data
+
+        Returns:
+            dict: Diccionario con valores permitidos.
+        """
+        try:
+            data = attrs.datos_extra
+        except AttributeError:
             return {}
 
-        data = attrs.datos_extra
-        if "payer_email" in data:
-            del data["payer_email"]
-
-        if "subject" in data:
-            del data["subject"]
-
-        if "currency" in data:
-            del data["currency"]
-
-        if "amount" in data:
-            del data["amount"]
-
-        if "transaction_id" in data:
-            del data["transaction_id"]
-
-        if "notify_url" in data:
-            del data["notify_url"]
-
-        if "notify_api_version" in data:
-            del data["notify_api_version"]
+        prohibidos = [
+            "amount",
+            "subject",
+            "currency",
+        ]
+        for valor in prohibidos:
+            if valor in data:
+                del data[valor]
 
         return data
 
-    def refund(self, payment, amount: int | None = None) -> int:
+    def refund(self, payment, amount: Optional[int] = None) -> int:
         """
         Realiza un reembolso del pago.
+        El seguimiendo se debe hacer directamente en Khipu
 
         Args:
-            payment: Objeto de pago.
+            payment ("Payment"): Objeto de pago Django Payments.
             amount (int | None): Monto a reembolsar (opcional).
 
         Returns:
-            int: Monto reembolsado.
+            int: Monto de reembolso solicitado.
 
         Raises:
-            PaymentError: Error al realizar el reembolso.
+            PaymentError: Error al crear el reembolso.
 
         """
         if payment.status != PaymentStatus.CONFIRMED:
             raise PaymentError("El pago debe estar confirmado para reversarse.")
 
         to_refund = amount or payment.total
+
+        datos_reembolso = {"amount": to_refund}
         try:
-            refund = self._client.payments.post_refunds(payment.transaction_id, to_refund)
-        except (ValidationError, AuthorizationError, ServiceError) as pe:
+            refun_req = requests.post(
+                f"{self.api_endpoint}/v3/payments/{payment.token}/refunds",
+                data=datos_reembolso,
+                timeout=5,
+                headers=self.genera_headers(),
+            )
+            refun_req.raise_for_status()
+        except Exception as pe:
             raise PaymentError(pe)
         else:
-            payment.attrs.refund = refund
+            payment.attrs.solicitud_reembolso = refun_req.json()
             payment.save()
             payment.change_status(PaymentStatus.REFUNDED)
             return to_refund
-
-    def capture(self, payment, amount=None):
-        """
-        Captura el monto del pago.
-
-        Args:
-            payment: Objeto de pago.
-            amount: Monto a capturar (no utilizado).
-
-        Raises:
-            NotImplementedError: Método no implementado.
-
-        """
-        raise NotImplementedError()
-
-    def release(self, payment):
-        """
-        Libera el pago (no implementado).
-
-        Args:
-            payment: Objeto de pago.
-
-        Raises:
-            NotImplementedError: Método no implementado.
-
-        """
-        raise NotImplementedError()
