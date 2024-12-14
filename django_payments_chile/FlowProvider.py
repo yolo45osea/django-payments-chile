@@ -80,8 +80,9 @@ class FlowProvider(BasicProvider):
             try:
                 payment.attrs.datos_payment_create_flow = datos_para_flow
                 payment.save()
-            except Exception as e:
-                raise PaymentError(f"Ocurrió un error al guardar attrs.datos_flow: {e}")
+            except Exception as e:  # noqa
+                # Dificil llegar acá, y si llegamos es problema de django-payments
+                raise PaymentError(f"Ocurrió un error al guardar attrs.datos_flow: {e}")  # noqa
 
             firma_datos = ...
             datos_para_flow.update({"s": firma_datos})
@@ -228,7 +229,7 @@ class FlowProvider(BasicProvider):
         Raises:
             NotImplementedError: Método no implementado.
         """
-        raise NotImplementedError()
+        raise NotImplementedError()  # noqa
 
     def release(self):
         """
@@ -241,4 +242,4 @@ class FlowProvider(BasicProvider):
             NotImplementedError: Método no implementado.
 
         """
-        raise NotImplementedError()
+        raise NotImplementedError()  # noqa
