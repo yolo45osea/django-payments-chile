@@ -92,7 +92,7 @@ src_paths = ["django_payments_chile", "tests"]
 
 
 [tool.coverage.report]
-exclude_lines = ["if TYPE_CHECKING:"]
+exclude_lines = ["if TYPE_CHECKING:", "# noqa", "# nosec"]
 
 [tool.django-stubs]
 django_settings_module = "tests.django_settings"

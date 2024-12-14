@@ -12,6 +12,7 @@ API_SECRET = "flow_test_secret"  # nosec
 
 class payment_attrs:
     session = dict
+    extra_data = dict
 
 
 class Payment(Mock):
@@ -48,6 +49,7 @@ class Payment(Mock):
 class TestFlowProviderLive(TestCase):
     def test_provider_create_session_success(self):
         test_payment = Payment()
+        test_payment.attrs.datos_extra = {"payment_currency": "CLP"}
         provider = FlowProvider(api_key=API_KEY, api_secret=API_SECRET)
         with patch("django_payments_chile.FlowProvider.requests.post") as mock_post:
             # Configure mock response
