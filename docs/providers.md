@@ -14,22 +14,6 @@ pip install django-payments-chile[todos]
 
 ### Flow
 
-#### Instalación
-
-Opción 1: Instalación específica
-
-```shell
-pip install django-payments-chile[flow]
-```
-
-Opción 2: Instalación manual
-
-```shell
-pip install pyflowcl
-```
-
-#### Configuración
-
 No es necesario agregar el módulo en `INSTALLED_APPS`. Añade la siguiente configuración a `PAYMENT_VARIANTS` en tu archivo `settings.py`:
 
 ```python
@@ -45,42 +29,19 @@ PAYMENT_VARIANTS = {
 
 ### Khipu
 
-#### Instalación
-
-Opción 1: Instalación específica
-
-```shell
-pip install django-payments-chile[khipu]
-```
-
-Opción 2: Instalación manual
-
-```shell
-pip install pykhipu
-```
-
-#### Configuración
-
 No es necesario agregar el módulo en `INSTALLED_APPS`. Añade la siguiente configuración a `PAYMENT_VARIANTS` en tu archivo `settings.py`:
+
+La nueva version de la API de Khipu ya no usa el id de cobrador, debes generar una nueva API Key para ser usada acá.
 
 ```python
 PAYMENT_VARIANTS = {
     "khipu": ("django_payments_chile.KhipuProvider", {
-        "receiver_id": 1,
-        "secret": "qwertyasdf0123456789",
-        "user_notification": "1.3",
-        "bank_id": "qwe123"
+        "api_key": "qwertyasdf0123456789",
     })
 }
 ```
 
 ### Payku
-
-#### Instalación
-
-No se requiere instalación adicional.
-
-#### Configuración
 
 Añade la siguiente configuración a `PAYMENT_VARIANTS` en tu archivo `settings.py`:
 
@@ -96,6 +57,6 @@ PAYMENT_VARIANTS = {
 
 ## Notas adicionales
 
--   Asegúrate de reemplazar los valores de ejemplo (como "flow_key", "flow_secret", etc.) con tus credenciales reales proporcionadas por cada proveedor de pagos.
--   Para entornos de producción, cambia los valores de "api_endpoint" y "site" a "live" o "production" según corresponda.
--   Consulta la documentación oficial de cada proveedor para obtener información detallada sobre opciones de configuración adicionales y mejores prácticas de implementación.
+- Asegúrate de reemplazar los valores de ejemplo (como "flow_key", "flow_secret", etc.) con tus credenciales reales proporcionadas por cada proveedor de pagos.
+- Para entornos de producción, cambia los valores de "api_endpoint" y "site" a "live" o "production" según corresponda.
+- Consulta la documentación oficial de cada proveedor para obtener información detallada sobre opciones de configuración adicionales y mejores prácticas de implementación.

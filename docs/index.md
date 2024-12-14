@@ -1,38 +1,70 @@
 # django-payments-chile
 
-`django-payments-chile` es una extensión para `django-payments`, una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
+`django-payments-chile` es una extensión para [django-payments](https://github.com/jazzband/django-payments), una biblioteca que proporciona una interfaz universal para procesar pagos en aplicaciones Django. Este proyecto añade soporte específico para varios proveedores de pagos chilenos como Flow, Khipu, Webpay, y otros.
 
-![PyPI - Status](https://img.shields.io/pypi/status/django-payments-flow)
-[![Downloads](https://pepy.tech/badge/django-payments-flow)](https://pepy.tech/project/django-payments-flow)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/7dc3c8d6fe844fdaa1de0cb86c242934)](https://app.codacy.com/gh/mariofix/django-payments-flow/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
-[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/7dc3c8d6fe844fdaa1de0cb86c242934)](https://app.codacy.com/gh/mariofix/django-payments-flow/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
-[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mariofix/django-payments-flow/main.svg)](https://results.pre-commit.ci/latest/github/mariofix/django-payments-flow/main)
-![PyPI](https://img.shields.io/pypi/v/django-payments-flow)
-![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-flow)
-![PyPI - Implementation](https://img.shields.io/pypi/implementation/django-payments-flow)
-![PyPI - License](https://img.shields.io/pypi/l/django-payments-flow)
+⚠️ ⚠️ **Este proyecto está en desarrollo activo**, usar con precaución. ⚠️ ⚠️
 
-## Características
+![PyPI - Status](https://img.shields.io/pypi/status/django-payments-chile)
+[![Downloads](https://pepy.tech/badge/django-payments-chile)](https://pepy.tech/project/django-payments-chile)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/fde07768d1714b0b93c6addd5e13bb7f)](https://app.codacy.com/gh/mariofix/django-payments-chile/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage)
+[![pre-commit.ci status](https://results.pre-commit.ci/badge/github/mariofix/django-payments-chile/main.svg)](https://results.pre-commit.ci/latest/github/mariofix/django-payments-chile/main)
+[![Tests & Coverage](https://github.com/mariofix/django-payments-chile/actions/workflows/tests_coverage.yml/badge.svg?branch=main)](https://github.com/mariofix/django-payments-chile/actions/workflows/tests_coverage.yml)
+![PyPI](https://img.shields.io/pypi/v/django-payments-chile)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/django-payments-chile)
+![PyPI - Implementation](https://img.shields.io/pypi/implementation/django-payments-chile)
+![PyPI - License](https://img.shields.io/pypi/l/django-payments-chile)
 
-- Soporte para múltiples proveedores de pago en un solo proyecto.
-- API consistente para crear, procesar y verificar transacciones.
-- Fácil configuración y personalización.
-- Documentación clara para desarrolladores.
-- Soporte para eventos de éxito, fallo, y reembolsos de pagos.
+## Proveedores de pago soportados
+
+| Proveedor | Estado | Descripcion |
+| --- | --- | --- |
+| Flow | ✅ | Plataforma chilena para pagos en línea que admite múltiples métodos de pago. |
+| Khipu | ✅ | Permite pagos mediante transferencia electrónica en tiempo real. |
+| Klap | ❌ | Solución de pagos electrónicos enfocados en comercios. |
+| Kushki | ❌ | Proveedor de pagos electrónicos que facilita la integración con diversas plataformas. |
+| Onepay | ❌ | Pago rápido y seguro usando códigos QR. |
+| Payku | ❌ | Plataforma de pagos enfocada en pequeñas y medianas empresas. |
+| Webpay | ❌ | El sistema de pago en línea más utilizado en Chile, operado por Transbank. |
 
 ## Inicio rápido
 
-### Instalación
+## Instalación
+
+La biblioteca `django-payments-chile` está disponible en PyPi. Puedes instalarla fácilmente con tu gestor de paquetes favorito, como `pip`, `poetry`, o `pipenv`.
 
 ```bash
+pip install django-payments-chile
+```
+
+### Instalación de Extras
+
+Algunos proveedores requieren dependencias adicionales para funcionar correctamente. Puedes instalar estas dependencias mediante extras:
+
+```bash
+# Instala todas las dependencias extra
 pip install django-payments-chile[todos]
 ```
 
-Adicionalmente puedes instalar los extras para cada integrador:
+Los extras disponibles son:
 
-- **flow**: Instala extras para Flow.
-- **khipu**: Instala extras para Khipu.
-- **todos**: Instala todos los extras.
+- **webpay**: Incluye la dependencia `transbank-sdk`.
+- **oneclick**: También incluye `transbank-sdk`.
+- **todos**: Instala todas las dependencias extra mencionadas.
+
+Por ejemplo, para instalar solo las dependencias necesarias para Webpay, puedes ejecutar:
+
+```bash
+pip install django-payments-chile[webpay]
+```
+
+Esto es equivalente a instalar las dependencias manualmente:
+
+```bash
+pip install django-payments-chile transbank-sdk
+```
+
+**Nota**: La instalación de extras es opcional. Si prefieres, puedes gestionar las dependencias adicionales de forma manual en tu proyecto.
 
 ### Configuración
 
@@ -77,15 +109,3 @@ return redirect(redirect_url)
 ```
 
 Para más detalles sobre el flujo de pago y las respuestas de los proveedores, consulta la sección [configuración](configuration.md).
-
-## Proveedores soportados
-
-- Flow
-- Khipu
-- Klap
-- Kushki
-- Payku
-- Webpay
-- Onepay
-
-Consulta la documentación para aprender cómo integrarlos.

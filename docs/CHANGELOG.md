@@ -13,10 +13,24 @@ y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.
 - Transbank WebPayPlus
 - Transbank OnePay
 
+## [2024.12.3b]
+
+- Tests: Khipu
+- Documentacion: Guias de Instalación
+
+## [2024.12.2a]
+
+- Tests: Flow
+- Provider: Khipu
+
+## [2024.12.1]
+
+- Provider: Flow
+
 ## [2024.9.29]
 
 - Cambios en Documentacion
-- Nuevos providers para: **Flow, Khipu, Payku**
+- Nuevos providers estructura base
 
 ## [2024.9.23]
 

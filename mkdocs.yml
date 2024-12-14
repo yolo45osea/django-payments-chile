@@ -37,7 +37,14 @@ nav:
   - Inicio: index.md
   - Uso: uso.md
   - Integraciones: providers.md
-  - Referencia: api.md
+  - Guias de Instalación:
+      - Aplicación Django: guia-django.md
+      - Tienda en Django: guias-tienda.md
+      - Desde Cero: guias.md
+  - Referencia:
+      - API: api.md
+      - FlowProvider: api-flowprovider.md
+      - KhipuProvider: api-khipuprovider.md
   - Colabora: contributing.md
   - Cambios: CHANGELOG.md
 

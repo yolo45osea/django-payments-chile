@@ -228,27 +228,3 @@ class FlowProvider(BasicProvider):
             payment.save()
             payment.change_status(PaymentStatus.REFUNDED)
             return to_refund
-
-    def capture(self):
-        """
-        Captura el pago (no implementado).
-
-        Note:
-            Método no soportado por Flow.
-        Raises:
-            NotImplementedError: Método no implementado.
-        """
-        raise NotImplementedError()  # noqa
-
-    def release(self):
-        """
-        Libera el pago (no implementado).
-
-        Note:
-            Método no soportado por Flow.
-
-        Raises:
-            NotImplementedError: Método no implementado.
-
-        """
-        raise NotImplementedError()  # noqa
