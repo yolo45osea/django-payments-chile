@@ -1,10 +1,9 @@
-from dataclasses import asdict
 from typing import Any, Optional
 
 import requests
 from django.http import HttpResponseBadRequest, JsonResponse
 from payments import PaymentError, PaymentStatus, RedirectNeeded
-from payments.core import BasicProvider, get_base_url
+from payments.core import BasicProvider
 from payments.forms import PaymentForm as BasePaymentForm
 
 from .clientes import ClienteAPI
@@ -88,7 +87,7 @@ class FlowProvider(BasicProvider):
             datos_para_flow = dict(sorted(datos_para_flow.items()))
             firma_datos = ClienteAPI.genera_firma(datos_para_flow, self.api_secret)
             datos_para_flow.update({"s": firma_datos})
-            print(f"{datos_para_flow = }")
+
             try:
                 pago_req = requests.post(f"{self.api_endpoint}/payment/create", data=datos_para_flow, timeout=5)
                 pago_req.raise_for_status()
@@ -142,7 +141,6 @@ class FlowProvider(BasicProvider):
         datos_para_flow = dict(sorted(datos_para_flow.items()))
         firma_datos = ClienteAPI.genera_firma(datos_para_flow, self.api_secret)
         datos_para_flow.update({"s": firma_datos})
-        print(f"{datos_para_flow = }")
 
         try:
             # status = FlowPayment.getStatus(self._client, payment.transaction_id)
@@ -153,13 +151,13 @@ class FlowProvider(BasicProvider):
             raise e
         else:
             status = estado_req.json()
-            if status.status == 2:
+            if status["status"] == 2:
                 payment.change_status(PaymentStatus.CONFIRMED)
-            elif status.status == 3:
+            elif status["status"] == 3:
                 payment.change_status(PaymentStatus.REJECTED)
-            elif status.status == 4:
+            elif status["status"] == 4:
                 payment.change_status(PaymentStatus.ERROR)
-        return asdict(status)
+        return status
 
     def _extra_data(self, attrs) -> dict:
         """Busca los datos que son enviandos por django-payments y los saca del diccionario
@@ -210,21 +208,23 @@ class FlowProvider(BasicProvider):
             raise PaymentError("El pago debe estar confirmado para reversarse.")
 
         to_refund = amount or payment.total
+
+        datos_reembolso = {
+            "apiKey": self.api_key,
+            "refundCommerceOrder": payment.token,
+            "receiverEmail": payment.billing_email,
+            "amount": to_refund,
+            "urlCallBack": payment.get_process_url(),
+            "commerceTrxId": payment.token,
+            "flowTrxId": payment.attrs.respuesta_flow["flowOrder"],
+        }
         try:
-            datos_reembolso = {
-                "apiKey": self.api_key,
-                "refundCommerceOrder": payment.token,
-                "receiverEmail": payment.billing_email,
-                "amount": to_refund,
-                "urlCallBack": f"{get_base_url()}{payment.get_process_url()}",
-                "commerceTrxId": payment.token,
-                "flowTrxId": payment.attrs.respuesta_flow["flowOrder"],
-            }
-            refund = datos_reembolso  # FlowRefund.create(self._client, datos_reembolso)
+            refun_req = requests.post(f"{self.api_endpoint}/refund/create", data=datos_reembolso, timeout=5)
+            refun_req.raise_for_status()
         except Exception as pe:
             raise PaymentError(pe)
         else:
-            payment.attrs.solicitud_reembolso = refund
+            payment.attrs.solicitud_reembolso = refun_req.json()
             payment.save()
             payment.change_status(PaymentStatus.REFUNDED)
             return to_refund
