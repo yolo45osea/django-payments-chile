@@ -47,7 +47,7 @@ class Payment(Mock):
 
 class TestFlowProviderLive(TestCase):
     def test_provider_create_session_success(self):
-        payment = Payment()
+        test_payment = Payment()
         provider = FlowProvider(api_key=API_KEY, api_secret=API_SECRET)
         with patch("django_payments_chile.FlowProvider.requests.post") as mock_post:
             # Configure mock response
@@ -57,12 +57,12 @@ class TestFlowProviderLive(TestCase):
             mock_post.return_value = mock_response
 
             with self.assertRaises(RedirectNeeded):
-                provider.get_form(payment)
+                provider.get_form(test_payment)
 
-            self.assertEqual(payment.status, PaymentStatus.WAITING)
-            self.assertEqual(payment.attrs.respuesta_flow["url"], "https://flow.cl")
-            self.assertEqual(payment.attrs.respuesta_flow["token"], "TOKEN_ID")
-            self.assertEqual(payment.attrs.respuesta_flow["flowOrder"], "ORDER_ID")
+            self.assertEqual(test_payment.status, PaymentStatus.WAITING)
+            self.assertEqual(test_payment.attrs.respuesta_flow["url"], "https://flow.cl")
+            self.assertEqual(test_payment.attrs.respuesta_flow["token"], "TOKEN_ID")
+            self.assertEqual(test_payment.attrs.respuesta_flow["flowOrder"], "ORDER_ID")
 
     def test_provider_create_session_error(self):
         payment = Payment()

@@ -7,6 +7,8 @@ from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider, get_base_url
 from payments.forms import PaymentForm as BasePaymentForm
 
+from .clientes import ClienteAPI
+
 
 class FlowProvider(BasicProvider):
     """
@@ -63,9 +65,9 @@ class FlowProvider(BasicProvider):
         if not payment.transaction_id:
             datos_para_flow = {
                 "apiKey": self.api_key,
-                "commerceOrder": payment.token,
+                "commerceOrder": str(payment.token),
                 "urlReturn": payment.get_success_url(),
-                "urlConfirmation": f"{get_base_url()}{payment.get_process_url()}",
+                "urlConfirmation": payment.get_process_url(),
                 "subject": payment.description,
                 "amount": int(payment.total),
                 "paymentMethod": self.api_medio,
@@ -83,9 +85,10 @@ class FlowProvider(BasicProvider):
             except Exception as e:  # noqa
                 # Dificil llegar acá, y si llegamos es problema de django-payments
                 raise PaymentError(f"Ocurrió un error al guardar attrs.datos_flow: {e}")  # noqa
-
-            firma_datos = ...
+            datos_para_flow = dict(sorted(datos_para_flow.items()))
+            firma_datos = ClienteAPI.genera_firma(datos_para_flow, self.api_secret)
             datos_para_flow.update({"s": firma_datos})
+            print(f"{datos_para_flow = }")
             try:
                 pago_req = requests.post(f"{self.api_endpoint}/payment/create", data=datos_para_flow, timeout=5)
                 pago_req.raise_for_status()
@@ -135,9 +138,15 @@ class FlowProvider(BasicProvider):
         Returns:
             dict: Diccionario con valores del objeto `PaymentStatus`.
         """
+        datos_para_flow = {"apiKey": self.api_key, "token": payment.token}
+        datos_para_flow = dict(sorted(datos_para_flow.items()))
+        firma_datos = ClienteAPI.genera_firma(datos_para_flow, self.api_secret)
+        datos_para_flow.update({"s": firma_datos})
+        print(f"{datos_para_flow = }")
+
         try:
             # status = FlowPayment.getStatus(self._client, payment.transaction_id)
-            estado_req = requests.post(f"{self.api_endpoint}/payment/getStatus", timeout=5)
+            estado_req = requests.get(f"{self.api_endpoint}/payment/getStatus", data=datos_para_flow, timeout=5)
             estado_req.raise_for_status()
 
         except Exception as e:
