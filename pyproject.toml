@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-payments-chile"
-version = "2024.12.3b"
+version = "2024.12.4b"
 description = "Pasarelas de pago chilenas para django-payments"
 readme = "README.md"
 authors = [{ "name" = "Mario Hernandez", "email" = "mariofix@proton.me" }]
@@ -49,9 +49,6 @@ Documentation = "https://mariofix.github.io/django-payments-chile/"
 
 
 [project.optional-dependencies]
-webpay = ["transbank-sdk>=5.0.0"]
-oneclick = ["transbank-sdk>=5.0.0"]
-todos = ["transbank-sdk>=5.0.0"]
 dev = [
     "pre-commit",
     "black",

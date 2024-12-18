@@ -23,9 +23,8 @@
 | Khipu | ✅ | Permite pagos mediante transferencia electrónica en tiempo real. |
 | Klap | ❌ | Solución de pagos electrónicos enfocados en comercios. |
 | Kushki | ❌ | Proveedor de pagos electrónicos que facilita la integración con diversas plataformas. |
-| Onepay | ❌ | Pago rápido y seguro usando códigos QR. |
 | Payku | ❌ | Plataforma de pagos enfocada en pequeñas y medianas empresas. |
-| Webpay | ❌ | El sistema de pago en línea más utilizado en Chile, operado por Transbank. |
+| Webpay | ✅ | El sistema de pago en línea más utilizado en Chile, operado por Transbank. |
 
 ## Inicio rápido
 
@@ -36,35 +35,6 @@ La biblioteca `django-payments-chile` está disponible en PyPi. Puedes instalarl
 ```bash
 pip install django-payments-chile
 ```
-
-### Instalación de Extras
-
-Algunos proveedores requieren dependencias adicionales para funcionar correctamente. Puedes instalar estas dependencias mediante extras:
-
-```bash
-# Instala todas las dependencias extra
-pip install django-payments-chile[todos]
-```
-
-Los extras disponibles son:
-
-- **webpay**: Incluye la dependencia `transbank-sdk`.
-- **oneclick**: También incluye `transbank-sdk`.
-- **todos**: Instala todas las dependencias extra mencionadas.
-
-Por ejemplo, para instalar solo las dependencias necesarias para Webpay, puedes ejecutar:
-
-```bash
-pip install django-payments-chile[webpay]
-```
-
-Esto es equivalente a instalar las dependencias manualmente:
-
-```bash
-pip install django-payments-chile transbank-sdk
-```
-
-**Nota**: La instalación de extras es opcional. Si prefieres, puedes gestionar las dependencias adicionales de forma manual en tu proyecto.
 
 ### Configuración
 

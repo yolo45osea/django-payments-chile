@@ -8,7 +8,6 @@ Para obtener detalles sobre cada proveedor, consulte los siguientes enlaces:
 - [KhipuProvider](api-khipuprovider.md)
 - [KlapProvider](klap-provider.md)
 - [KushkiProvider](kushki-provider.md)
-- [OneclickProvider](oneclick-provider.md)
 - [PagofacilProvider](pagofacil-provider.md)
 - [PaykuProvider](payku-provider.md)
-- [WebpayProvider](webpay-provider.md)
+- [WebpayProvider](api-webpayprovider.md)

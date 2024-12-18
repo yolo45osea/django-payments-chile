@@ -7,7 +7,7 @@ Django-Payments utiliza el concepto de proveedores y variantes para establecer c
 Para instalar todos los proveedores, ejecuta:
 
 ```shell
-pip install django-payments-chile[todos]
+pip install django-payments-chile
 ```
 
 ## Proveedores disponibles

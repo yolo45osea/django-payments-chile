@@ -2,16 +2,15 @@
 
 Cambios notables de Django Payments Chile
 
-Formato basado en [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-y este proyecto se adhiere a [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
 ## [Unreleased]
 
 - Klap
 - Kushki
 - Pagofacil
-- Transbank WebPayPlus
-- Transbank OnePay
+
+## [2024.12.4b]
+
+- Provider: Transbank WebPayPlus
 
 ## [2024.12.3b]
 
