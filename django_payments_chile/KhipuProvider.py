@@ -62,12 +62,8 @@ class KhipuProvider(BasicProvider):
 
             datos_para_khipu.update(**self._extra_data(payment.attrs))
 
-            try:
-                payment.attrs.datos_payment_create = datos_para_khipu
-                payment.save()
-            except Exception as e:  # noqa
-                # Dificil llegar acá, y si llegamos es problema de django-payments
-                raise PaymentError(f"Ocurrió un error al guardar attrs.datos_payment_create: {e}")  # noqa
+            payment.attrs.datos_payment_create = datos_para_khipu
+            payment.save()
 
             try:
                 pago_req = requests.post(
@@ -113,7 +109,7 @@ class KhipuProvider(BasicProvider):
 
         """
         if "transaction_id" not in request.POST:
-            raise HttpResponseBadRequest("transaction_id no está en post")
+            return HttpResponseBadRequest("transaction_id no está en post")
 
         if payment.status in [PaymentStatus.WAITING, PaymentStatus.PREAUTH]:
             self.actualiza_estado(payment=payment)

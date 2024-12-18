@@ -2,7 +2,6 @@ from typing import Any, Optional
 
 import requests
 from django.http import JsonResponse
-from django.shortcuts import redirect
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider
 from payments.forms import PaymentForm as BasePaymentForm
@@ -173,28 +172,7 @@ class WebpayProvider(BasicProvider):
         """
 
         if payment.status in [PaymentStatus.WAITING, PaymentStatus.PREAUTH]:
-            token = self.get_token_from_request(None, payment)
-
-        try:
-            commit_data = self.commit(token)
-
-            # Esto no está bien, request se ejecuta en commit
-            # commit no retorna datos.
-            # Ordenar bien
-            commit_data["vci_str"] = self.agrega_info_error("vci", commit_data["vci"])
-            commit_data["payment_type_code_str"] = self.agrega_info_error("pago", commit_data["payment_type_code"])
-            payment.attrs.commit_response = commit_data
-            payment.save()
-
-        except PaymentError as e:
-            raise e
-        except RedirectNeeded as url:
-            if url == "success":
-                payment.change_status(PaymentStatus.CONFIRMED)
-                redirect(payment.get_success_url())
-            else:
-                payment.change_status(PaymentStatus.REJECTED)
-                redirect(payment.get_failure_url())
+            self.commit(self.get_token_from_request(None, payment), payment)
 
     def get_token_from_request(self, payment, request) -> str:
         """Return payment token from provider request."""
@@ -204,7 +182,7 @@ class WebpayProvider(BasicProvider):
         except Exception as e:
             raise PaymentError(
                 code=400,
-                message="tdata=datos_para_flowoken_ws is not present",
+                message="token_ws is not present",
             ) from e
 
     def actualiza_estado(self, payment) -> dict:
@@ -238,7 +216,7 @@ class WebpayProvider(BasicProvider):
                 payment.change_status(PaymentStatus.REJECTED)
                 return PaymentStatus.REJECTED
 
-    def commit(self, token):
+    def commit(self, token, payment):
         """Se debe llamar al procesar el retorno"""
         try:
             commit_req = requests.put(
@@ -251,6 +229,10 @@ class WebpayProvider(BasicProvider):
             raise e
         else:
             commit = commit_req.json()
+            commit["vci_str"] = self.agrega_info_error("vci", commit["vci"])
+            commit["payment_type_code_str"] = self.agrega_info_error("pago", commit["payment_type_code"])
+            payment.attrs.commit_response = commit
+            payment.save()
             if commit["status"] == "AUTHORIZED" and commit["response_code"] == 0:
                 raise RedirectNeeded("success")
             else:
