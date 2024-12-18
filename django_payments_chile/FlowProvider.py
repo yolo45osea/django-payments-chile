@@ -121,7 +121,7 @@ class FlowProvider(BasicProvider):
 
         """
         if "token" not in request.POST:
-            raise HttpResponseBadRequest("token no está en post")
+            return HttpResponseBadRequest("token no está en post")
 
         if payment.status in [PaymentStatus.WAITING, PaymentStatus.PREAUTH]:
             self.actualiza_estado(payment=payment)
