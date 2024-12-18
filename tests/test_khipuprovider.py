@@ -34,16 +34,16 @@ class Payment(Mock):
         self.message = message
 
     def get_failure_url(self):
-        return "http://mi-app.cl/error"
+        return "https://mi-app.cl/error"
 
     def get_process_url(self):
-        return "http://mi-app.cl/process"
+        return "https://mi-app.cl/process"
 
     def get_purchased_items(self):
         return []
 
     def get_success_url(self):
-        return "http://mi-app.cl/exito"
+        return "https://mi-app.cl/exito"
 
 
 class TestKhipuProvider(TestCase):

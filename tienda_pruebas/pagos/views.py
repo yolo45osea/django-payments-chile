@@ -3,8 +3,8 @@ from payments import get_payment_model
 
 
 def crear_pago(request):
-    Payment = get_payment_model()
-    payment = Payment.objects.create(
+    payment = get_payment_model()
+    payment = payment.objects.create(
         variant="flow",  # Debe coincidir con el nombre en PAYMENT_VARIANTS
         description="Pago por Orden #123",
         total=10000,  # Monto en centavos (100 pesos)
