@@ -104,3 +104,27 @@ addopts = [
 testpaths = "tests"
 DJANGO_SETTINGS_MODULE = "tests.django_settings"
 pythonpath = "."
+
+[dependency-groups]
+dev = [
+    "pre-commit",
+    "black",
+    "isort",
+    "coverage",
+    "pytest",
+    "faker",
+    "mkdocs",
+    "mkdocs-material",
+    "mkdocstrings[python]",
+    "mkdocs-git-revision-date-localized-plugin",
+    "pillow",
+    "cairosvg",
+    "lxml",
+    "pytest-cov",
+    "pytest-django",
+    "pytest-mock",
+    "dj-database-url",
+    "factory-boy",
+    "tox",
+    "tox-gh-actions",
+]
