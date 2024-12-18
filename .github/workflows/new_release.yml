@@ -52,10 +52,12 @@ jobs:
         uses: abatilo/actions-poetry@v3
         with:
           poetry-version: ${{ matrix.poetry-version }}
+      - name: Setup Latest Poetry
+        run: pipx install --suffix @main 'poetry @ git+https://github.com/python-poetry/poetry'
       - name: Install django-payments-chile
-        run: poetry install --with dev
+        run: poetry@main install --with dev
       - name: Deploy Docs
-        run: poetry run mkdocs gh-deploy --force
+        run: poetry@main run mkdocs gh-deploy --force
 
   pypi-publish:
     name: Build and Upload
@@ -78,9 +80,11 @@ jobs:
         uses: actions/setup-python@v5
       - name: Set Up Poetry
         uses: abatilo/actions-poetry@v3
+      - name: Setup Latest Poetry
+        run: pipx install --suffix @main 'poetry @ git+https://github.com/python-poetry/poetry'
       - name: Install django-payments-chile
-        run: poetry install --with dev
+        run: poetry@main install --with dev
       - name: Build django-payments-chile
-        run: poetry build
+        run: poetry@main build
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
