@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "django-payments-chile"
-version = "2024.12.4b"
+version = "2024.12.5"
 description = "Pasarelas de pago chilenas para django-payments"
 readme = "README.md"
 authors = [{ "name" = "Mario Hernandez", "email" = "mariofix@proton.me" }]
