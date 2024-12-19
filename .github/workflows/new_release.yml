@@ -83,8 +83,8 @@ jobs:
       - name: Setup Latest Poetry
         run: pipx install --suffix @main 'poetry @ git+https://github.com/python-poetry/poetry'
       - name: Install django-payments-chile
-        run: poetry@main install --with dev
+        run: poetry@main install --all-extras --all-groups
       - name: Build django-payments-chile
         run: poetry@main build
-      # - name: Publish package distributions to PyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
+      - name: Publish package distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
