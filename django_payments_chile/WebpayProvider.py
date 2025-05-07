@@ -1,10 +1,15 @@
 from typing import Any, Optional
 
+from django.urls import reverse
 import requests
 from django.http import JsonResponse
 from payments import PaymentError, PaymentStatus, RedirectNeeded
 from payments.core import BasicProvider
 from payments.forms import PaymentForm as BasePaymentForm
+import logging
+
+
+logger = logging.getLogger(__name__)
 
 vci_status = {
     "TSY": "Autenticación Exitosa",
@@ -119,28 +124,39 @@ class WebpayProvider(BasicProvider):
 
         Raises:
             RedirectNeeded: Redirige a la página de pago.
-
         """
         if not payment.transaction_id:
+            token = str(payment.token).replace("-", "")[:26]
             datos_para_tbk = {
-                "buy_order": str(payment.token),
-                "session": str(payment.token),
+                "buy_order": token,
+                "session_id": token,
                 "return_url": payment.get_process_url(),
                 "amount": int(payment.total),
             }
 
             try:
+                # Solicitar la creación del pago en Webpay
                 pago_req = requests.post(
-                    f"{self.api_endpoint} /rswebpaytransaction/api/webpay/v1.2/transactions",
-                    data=datos_para_tbk,
+                    f"{self.api_endpoint}rswebpaytransaction/api/webpay/v1.2/transactions",
+                    json=datos_para_tbk,
+                    headers=self.genera_headers(),
                     timeout=5,
                 )
+                # Lanzar una excepción si la respuesta es un error
                 pago_req.raise_for_status()
 
-            except Exception as pe:
-                payment.change_status(PaymentStatus.ERROR, str(pe))
-                raise PaymentError(pe)
+            except requests.exceptions.RequestException as e:
+                logger.info(f"return_url: {payment.get_process_url()}")
+                logger.error(f"Error en la solicitud a Webpay: {str(e)}")
+                if hasattr(e, 'response') and e.response:
+                    logger.error(f"Status Code: {e.response.status_code}")
+                    logger.error(f"Headers: {e.response.headers}")
+                    logger.error(f"Respuesta de Webpay: {e.response.text}")
+                payment.change_status(PaymentStatus.ERROR, str(e))
+                raise PaymentError(f"Error al procesar el pago: {str(e)}")
+
             else:
+                # Si la solicitud es exitosa, procesar la respuesta de Webpay
                 pago = pago_req.json()
                 payment.transaction_id = pago["token"]
                 payment.attrs.request_tbk = datos_para_tbk
@@ -148,9 +164,11 @@ class WebpayProvider(BasicProvider):
                 payment.save()
                 payment.change_status(PaymentStatus.PREAUTH)
 
+            # Redirigir al cliente a Webpay para completar el pago
             raise RedirectNeeded(f"{pago['url']}?token_ws={pago['token']}")
 
     def genera_headers(self):
+        
         return {
             "Content-Type": "application/json",
             "Tbk-Api-Key-Id": self.api_key_id,
@@ -172,18 +190,22 @@ class WebpayProvider(BasicProvider):
         """
 
         if payment.status in [PaymentStatus.WAITING, PaymentStatus.PREAUTH]:
-            self.commit(self.get_token_from_request(None, payment), payment)
+            self.commit(self.get_token_from_request(request, payment), payment)
 
-    def get_token_from_request(self, payment, request) -> str:
+    def get_token_from_request(self, request, payment) -> str:
         """Return payment token from provider request."""
-
-        try:
-            return request.POST["token_ws"] or request.GET["token_ws"]
-        except Exception as e:
+        
+        # Intentar obtener el 'token_ws' desde POST o GET usando el método `get()` para evitar excepciones
+        token_ws = request.POST.get("token_ws") or request.GET.get("token_ws")
+        
+        # Si no se encuentra el token_ws, lanzar un error con mensaje claro
+        if not token_ws:
             raise PaymentError(
                 code=400,
-                message="token_ws is not present",
-            ) from e
+                message="token_ws is not present in the request."
+            )
+        
+        return token_ws
 
     def actualiza_estado(self, payment) -> dict:
         """Actualiza el estado del pago con Flow
@@ -233,10 +255,16 @@ class WebpayProvider(BasicProvider):
             commit["payment_type_code_str"] = self.agrega_info_error("pago", commit["payment_type_code"])
             payment.attrs.commit_response = commit
             payment.save()
+
+            # Verificar el estado de la transacción
             if commit["status"] == "AUTHORIZED" and commit["response_code"] == 0:
-                raise RedirectNeeded("success")
+                # Redirigir a la página de éxito
+                redirect_url = reverse('payment_success', kwargs={'pk': payment.pk})
             else:
-                raise RedirectNeeded("error")
+                # Redirigir a la página de error
+                redirect_url = reverse('payment_failure', kwargs={'pk': payment.pk})
+
+            raise RedirectNeeded(redirect_url)
 
     def refund(self, payment, amount: Optional[int] = None) -> int:
         """
